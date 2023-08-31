@@ -34,8 +34,7 @@ namespace Identity_Server.Controllers
             };
             
             await _userManager.CreateAsync(user, loginVm.Password);
-            await _userManager.AddClaimAsync(user, new Claim("gramma", "Big.cookie"));
-            await _userManager.AddClaimAsync(user, new Claim("Api.gramma", "Api.Big.cookie"));
+    
             var result = await _signInManager
                     .PasswordSignInAsync(loginVm.UserName, loginVm.Password, false, false);
             if (result.Succeeded)
@@ -45,5 +44,6 @@ namespace Identity_Server.Controllers
                 
             return View();
         }
+       
     }
 }

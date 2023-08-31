@@ -11,7 +11,7 @@ builder
     .Services
     .AddDbContext<ApplicationContext>(config =>
     {
-        config.UseSqlServer("server=.;database=IdentityServer;Trusted_Connection=SSPI;Encrypt=false;TrustServerCertificate=true");
+        config.UseSqlServer("server=localhost\\SQLEXPRESS;database=IdentityServer;Trusted_Connection=SSPI;Encrypt=false;TrustServerCertificate=true");
     });
 
 builder
@@ -44,9 +44,20 @@ builder.Services.AddIdentityServer()
                 .AddInMemoryApiResources(Configuration.GetApis())
                 .AddInMemoryIdentityResources(Configuration.GetIdentityResource())
                 .AddInMemoryClients(Configuration.GetClients())
-                .AddDeveloperSigningCredential();
-                
+                .AddDeveloperSigningCredential()
+                .AddProfileService<IdentityProfileService>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder =>
+        {
+            builder
+                .AllowAnyOrigin()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
@@ -55,10 +66,12 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    //app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowAllOrigins");
+
 app.UseStaticFiles();
 
 app.UseRouting();
