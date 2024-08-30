@@ -20,24 +20,24 @@ namespace Identity_Server
                     }
                 }
             };
-        public static IEnumerable<ApiResource> GetApiScopes()
-         => new List<ApiResource>{
-                new ApiResource("res1", "res2")
-                {
-                    Scopes = {new Scope("client_scope") }
-                }
-         };
+        //public static IEnumerable<ApiResource> GetApiScopes()
+        // => new List<ApiResource>{
+        //        new ApiResource("res1", "res2")
+        //        {
+        //            Scopes = {new Scope("client_scope") }
+        //        }
+        // };
         public static IEnumerable<ApiResource> GetApis() => new List<ApiResource>
         {
-            new ApiResource("ApiOne", new string[]
+            new ApiResource("ApiOne", new string[] { "Api.gramma" })
             {
-                "Api.gramma",
-            }),
+                ApiSecrets = {new Secret("client_secret".ToSha256())},
+            },
             new ApiResource("ApiTwo"),
-              new ApiResource("res1", "res2")
-                {
-                    Scopes = {new Scope("client_scope") }
-                }
+            new ApiResource("res1", "res2")
+            {
+                Scopes = {new Scope("client_scope") }
+            }
         };
         public static IEnumerable<Client> GetClients() => new List<Client>
         {
