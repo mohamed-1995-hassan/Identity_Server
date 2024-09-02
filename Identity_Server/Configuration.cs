@@ -36,7 +36,10 @@ namespace Identity_Server
             new ApiResource("ApiTwo"),
             new ApiResource("res1", "res2")
             {
-                Scopes = {new Scope("client_scope") }
+                Scopes = 
+                {
+                    "client_scope",
+                }
             }
         };
         public static IEnumerable<Client> GetClients() => new List<Client>
