@@ -45,17 +45,10 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddIdentityServer()
     .AddAspNetIdentity<IdentityUser>()
-    .AddConfigurationStore(option =>
-    {
-        option.ConfigureDbContext = builder => builder.UseSqlServer(cs, sqlServerOptionsAction: sql => sql.MigrationsAssembly(migrationAssembly));
-    })
-    .AddOperationalStore(option =>
-    {
-        option.ConfigureDbContext = builder => builder.UseSqlServer(cs, sqlServerOptionsAction: sql => sql.MigrationsAssembly(migrationAssembly));
-    })
-    //.AddInMemoryApiResources(Configuration.GetApis())
-    //.AddInMemoryIdentityResources(Configuration.GetIdentityResource())
-    //.AddInMemoryClients(Configuration.GetClients())
+    .AddInMemoryApiScopes(Configuration.GetApiScopes())
+    .AddInMemoryApiResources(Configuration.GetApis())
+    .AddInMemoryIdentityResources(Configuration.GetIdentityResource())
+    .AddInMemoryClients(Configuration.GetClients())
     .AddDeveloperSigningCredential()
     .AddProfileService<IdentityProfileService>();
 
