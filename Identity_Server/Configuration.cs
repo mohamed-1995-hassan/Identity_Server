@@ -119,7 +119,6 @@ namespace Identity_Server
                 RequireConsent = false,
                 RequireClientSecret = false,
                 AlwaysIncludeUserClaimsInIdToken = true,
-                
             }
         };
     }
