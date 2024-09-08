@@ -20,14 +20,15 @@ namespace Identity_Server
                     }
                 }
             };
-        public static IEnumerable<ApiScope> GetApiScopes(){
+        public static IEnumerable<ApiScope> GetApiScopes()
+        {
             return new List<ApiScope>
             {
                 new ApiScope("ApiOne", "ApiOne"),
                 new ApiScope("res1", "res1"),
                 new ApiScope("res2", "res2"),
             };
-         }
+        }
 
         public static IEnumerable<ApiResource> GetApis() => new List<ApiResource>
         {
@@ -39,7 +40,7 @@ namespace Identity_Server
             new ApiResource("ApiTwo"),
             new ApiResource("res1", "res2")
             {
-                Scopes = 
+                Scopes =
                 {
                     "client_scope", "ApiOne", "profile", "openid"
                 }
@@ -50,22 +51,18 @@ namespace Identity_Server
             new Client
             {
                 Enabled = true,
+                ClientName = "M2M",
                 ClientId = "client_id",
                 ClientSecrets = {new Secret("client_secret".ToSha256())},
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 AllowedScopes = { "ApiOne", "profile", "openid" },
-                //FrontChannelLogoutUri = "https://localhost:7077/signout-oidc",
-                //PostLogoutRedirectUris = new List<string>() { "https://localhost:7077/signout-callback-oidc" },
                 AccessTokenLifetime = 1200, //20 Minutes
                 RequirePkce = true,
-                AllowPlainTextPkce = false,
-                AllowOfflineAccess = false,
-                RequireConsent = false,
-                //RedirectUris = { "http://localhost:4200" },
             },
             new Client
             {
-                Enabled = false,
+                Enabled = true,
+                ClientName = "Interaactive",
                 ClientId = "client_id_mvc",
                 ClientSecrets = {new Secret("client_secret_mvc".ToSha256())},
                 AllowedGrantTypes = GrantTypes.Code,
@@ -73,18 +70,12 @@ namespace Identity_Server
                 {
                     "ApiOne" ,
                     "ApiTwo",
-                    IdentityServer4
-                    .IdentityServerConstants
-                    .StandardScopes
-                    .OpenId,    
-                    //IdentityServer4
-                    //.IdentityServerConstants
-                    //.StandardScopes
-                    //.Profile,
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile,
                     "rc.scope"
                 },
                 RedirectUris = { "http://localhost:5131/signin-oidc" },
-
+                RequirePkce = true,
                 //put all claims in id token
                 //AlwaysIncludeUserClaimsInIdToken = true,
                 RequireConsent = false
@@ -97,10 +88,7 @@ namespace Identity_Server
                 RedirectUris = { "https://localhost:7276/signin" },
                 AllowedScopes =
                 {
-                    IdentityServer4
-                    .IdentityServerConstants
-                    .StandardScopes
-                    .OpenId,
+                    IdentityServerConstants.StandardScopes.OpenId,
                     "ApiOne"
                 },
                 AllowAccessTokensViaBrowser = true
@@ -119,6 +107,7 @@ namespace Identity_Server
                 RequireConsent = false,
                 RequireClientSecret = false,
                 AlwaysIncludeUserClaimsInIdToken = true,
+
             }
         };
     }
