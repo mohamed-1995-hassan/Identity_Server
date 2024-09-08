@@ -1,23 +1,28 @@
+using DemoIDP;
 using Identity_Server;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MvcClient;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
+var cs = builder.Configuration.GetConnectionString("MainConnection");
+string migrationAssembly = Assembly.GetExecutingAssembly().GetName().Name;
 
 builder
     .Services
     .AddDbContext<ApplicationContext>(config =>
     {
-        config.UseSqlServer("server=localhost\\SQLEXPRESS;database=IdentityServer;Trusted_Connection=SSPI;Encrypt=false;TrustServerCertificate=true");
+        config.UseSqlServer(cs);
     });
 
 builder
     .Services
     .AddIdentity<IdentityUser, IdentityRole>(config =>
     {
+        config.SignIn.RequireConfirmedAccount = false;
         config.Password.RequiredLength = 4;
         config.Password.RequireDigit = false;
         config.Password.RequireNonAlphanumeric = false;
@@ -39,13 +44,18 @@ builder
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddIdentityServer()
-                
-                .AddAspNetIdentity<IdentityUser>()
-                .AddInMemoryApiResources(Configuration.GetApis())
-                .AddInMemoryIdentityResources(Configuration.GetIdentityResource())
-                .AddInMemoryClients(Configuration.GetClients())
-                .AddDeveloperSigningCredential()
-                .AddProfileService<IdentityProfileService>();
+    .AddAspNetIdentity<IdentityUser>()
+    .AddInMemoryApiScopes(Configuration.GetApiScopes())
+    .AddInMemoryApiResources(Configuration.GetApis())
+    .AddInMemoryIdentityResources(Configuration.GetIdentityResource())
+    .AddInMemoryClients(Configuration.GetClients())
+    .AddDeveloperSigningCredential()
+    .AddProfileService<IdentityProfileService>();
+
+if (builder.Configuration.GetValue<bool>("SeedData"))
+{
+    SeedData.EnsureSeedData(cs);
+}
 
 builder.Services.AddCors(options =>
 {
@@ -76,7 +86,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 app.UseIdentityServer();
-
+app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",

@@ -20,36 +20,49 @@ namespace Identity_Server
                     }
                 }
             };
-        public static IEnumerable<ApiResource> GetApiScopes()
-         => new List<ApiResource>{
-                new ApiResource("res1", "res2")
-                {
-                    Scopes = {new Scope("client_scope") }
-                }
-         };
+        public static IEnumerable<ApiScope> GetApiScopes()
+        {
+            return new List<ApiScope>
+            {
+                new ApiScope("ApiOne", "ApiOne"),
+                new ApiScope("res1", "res1"),
+                new ApiScope("res2", "res2"),
+            };
+        }
+
         public static IEnumerable<ApiResource> GetApis() => new List<ApiResource>
         {
-            new ApiResource("ApiOne", new string[]
+            new ApiResource("ApiOne", new string[] { "Api.gramma" })
             {
-                "Api.gramma",
-            }),
+                ApiSecrets = {new Secret("client_secret".ToSha256())},
+                Scopes = { "ApiOne" },
+            },
             new ApiResource("ApiTwo"),
-              new ApiResource("res1", "res2")
+            new ApiResource("res1", "res2")
+            {
+                Scopes =
                 {
-                    Scopes = {new Scope("client_scope") }
+                    "client_scope", "ApiOne", "profile", "openid"
                 }
+            }
         };
         public static IEnumerable<Client> GetClients() => new List<Client>
         {
             new Client
             {
+                Enabled = true,
+                ClientName = "M2M",
                 ClientId = "client_id",
                 ClientSecrets = {new Secret("client_secret".ToSha256())},
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
-                AllowedScopes = { "ApiOne" }
+                AllowedScopes = { "ApiOne", "profile", "openid" },
+                AccessTokenLifetime = 1200, //20 Minutes
+                RequirePkce = true,
             },
             new Client
             {
+                Enabled = true,
+                ClientName = "Interaactive",
                 ClientId = "client_id_mvc",
                 ClientSecrets = {new Secret("client_secret_mvc".ToSha256())},
                 AllowedGrantTypes = GrantTypes.Code,
@@ -57,39 +70,32 @@ namespace Identity_Server
                 {
                     "ApiOne" ,
                     "ApiTwo",
-                    IdentityServer4
-                    .IdentityServerConstants
-                    .StandardScopes
-                    .OpenId,
-                    //IdentityServer4
-                    //.IdentityServerConstants
-                    //.StandardScopes
-                    //.Profile,
+                    IdentityServerConstants.StandardScopes.OpenId,
+                    IdentityServerConstants.StandardScopes.Profile,
                     "rc.scope"
                 },
                 RedirectUris = { "http://localhost:5131/signin-oidc" },
-
+                RequirePkce = true,
                 //put all claims in id token
                 //AlwaysIncludeUserClaimsInIdToken = true,
                 RequireConsent = false
             },
             new Client
             {
+                Enabled = false,
                 ClientId = "client_id_js",
                 AllowedGrantTypes = GrantTypes.ClientCredentials,
                 RedirectUris = { "https://localhost:7276/signin" },
                 AllowedScopes =
                 {
-                    IdentityServer4
-                    .IdentityServerConstants
-                    .StandardScopes
-                    .OpenId,
+                    IdentityServerConstants.StandardScopes.OpenId,
                     "ApiOne"
                 },
                 AllowAccessTokensViaBrowser = true
             },
             new Client
             {
+                Enabled = false,
                 ClientId = "angular_spa2",
                 ClientSecrets = { new Secret("client_secret".Sha256()) },
                 AllowedGrantTypes = GrantTypes.Code,
@@ -101,7 +107,7 @@ namespace Identity_Server
                 RequireConsent = false,
                 RequireClientSecret = false,
                 AlwaysIncludeUserClaimsInIdToken = true,
-                
+
             }
         };
     }
